@@ -1,0 +1,13 @@
+<html>
+<body>
+<div>
+    <form method="post" action="/login">
+        <div><label>Username: <input type="text" name="username"/> </label></div>
+        <div><label>Password: <input type="password" name="password"/> </label></div>
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+        <div><input type="submit" value="Sign in"/> </div>
+    </form>
+</div>
+<div><a href="/registration">Sing Up</a> </div>
+</body>
+</html>
