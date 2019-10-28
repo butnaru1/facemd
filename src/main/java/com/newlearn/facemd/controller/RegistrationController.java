@@ -5,6 +5,7 @@ import com.newlearn.facemd.domain.User;
 import com.newlearn.facemd.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,10 +25,11 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUser(User user, Map<String, Object> model) {
+    public String addUser(User user, Model model) {
         User userFromDb = userRepository.findByUsername(user.getUsername());
+        String alert = "Input your date:";
         if(userFromDb != null) {
-            model.put("message", "This user is already exist");
+            model.addAttribute("message", "User already exist!");
             return "registration";
         }
         else{
