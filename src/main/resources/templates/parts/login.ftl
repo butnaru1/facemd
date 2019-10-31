@@ -7,6 +7,14 @@
                 <input type="username" class="form-control" name="username" placeholder="Username">
             </div>
         </div>
+        <#if isRegisterForm>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Username</label>
+            <div class="col-sm-6">
+                <input type="email" class="form-control" name="email" placeholder="name@mail.com">
+            </div>
+        </div>
+        </#if>
      <div class="form-group row">
         <label  class="col-sm-2 col-form-label">Password</label>
         <div class="col-sm-6">
