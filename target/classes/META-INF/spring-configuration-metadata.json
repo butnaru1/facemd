@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "google.recaptcha.key",
+      "type": "com.newlearn.facemd.configuration.CaptchaSettings",
+      "sourceType": "com.newlearn.facemd.configuration.CaptchaSettings"
+    }
+  ],
+  "properties": [
+    {
+      "name": "google.recaptcha.key.secret",
+      "type": "java.lang.String",
+      "sourceType": "com.newlearn.facemd.configuration.CaptchaSettings"
+    },
+    {
+      "name": "google.recaptcha.key.site",
+      "type": "java.lang.String",
+      "sourceType": "com.newlearn.facemd.configuration.CaptchaSettings"
+    }
+  ],
+  "hints": []
+}

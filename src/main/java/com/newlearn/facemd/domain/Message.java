@@ -1,13 +1,19 @@
 package com.newlearn.facemd.domain;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @NotBlank(message = "Please fill the message")
+    @Length(max = 2540, message = "Message too long (no more than 2500)")
     private String text;
+    @Length(max = 255, message = "Tag too long (no more than 255)")
     private String tag;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")

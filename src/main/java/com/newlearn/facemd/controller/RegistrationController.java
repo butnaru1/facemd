@@ -1,19 +1,37 @@
 package com.newlearn.facemd.controller;
 
 import com.newlearn.facemd.domain.User;
+import com.newlearn.facemd.domain.dto.CaptchaResponseDto;
 import com.newlearn.facemd.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
+
+import javax.validation.Valid;
+import java.util.Collections;
+import java.util.Map;
 
 @Controller
 public class RegistrationController {
+    private final static String CAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s";
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
+    @Value("${google.recaptcha.key.secret}")
+    private String secret;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
 
     @GetMapping("/registration")
     public String registration() {
@@ -21,24 +39,52 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUser(User user, Model model) {
+    public String addUser(
+            @RequestParam("passwordConfirm") String passwordConfirm,
+            @RequestParam("g-recaptcha-response") String recaptchaResponse,
+            @Valid User user,
+            BindingResult bindingResult,
+            Model model) {
+        String url = String.format(CAPTCHA_URL, secret, recaptchaResponse);
+        CaptchaResponseDto response =  restTemplate.postForObject(url, Collections.EMPTY_LIST, CaptchaResponseDto.class);
 
-        if(!userService.addUser(user)) {
-            model.addAttribute("message", "User already exist!");
-            return "registration";
+        if (!response.isSuccess())
+            model.addAttribute("captchaError","Fill captcha");
+
+
+        boolean isConfirmEmpty = StringUtils.isEmpty(passwordConfirm);
+        if (isConfirmEmpty) {
+            model.addAttribute("password2Error", "Password are different!");
         }
-        else{
+        if (user.getPassword() != null && !user.getPassword().equals(passwordConfirm)) {
+            model.addAttribute("passwordError", "Passwords are different!");
+        }
+
+        if (isConfirmEmpty || bindingResult.hasErrors() || !response.isSuccess()) {
+            Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
+            model.mergeAttributes(errors);
+            return "/registration";
+        }
+
+        if (!userService.addUser(user)) {
+            model.addAttribute("usernameError", "User already exist!");
+            return "registration";
+        } else {
             userService.addUser(user);
             return "redirect:/login";
         }
     }
 
     @GetMapping("/activate/{code}")
-        public String activate(@PathVariable String code, Model model){
-            boolean isActivated = userService.activateUser(code);
-            if (isActivated)
-                model.addAttribute("message", "User successfully activated");
-            else model.addAttribute("message", "Activation failed");
-        return "login";
+    public String activate(@PathVariable String code, Model model) {
+        boolean isActivated = userService.activateUser(code);
+        if (isActivated) {
+            model.addAttribute("messageType", "success");
+            model.addAttribute("message", "User successfully activated");
+        } else {
+            model.addAttribute("messageType", "danger");
+            model.addAttribute("message", "Activation failed");
         }
+        return "login";
+    }
 }
