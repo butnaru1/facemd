@@ -51,6 +51,7 @@ public class MainController {
             @RequestParam String tag,
             @RequestParam("file") MultipartFile file,
             Map<String, Object> model) throws IOException {
+        //change2
         //change
         Message message = new Message(text, tag, user);
         if (file != null && !file.getOriginalFilename().isEmpty()){
